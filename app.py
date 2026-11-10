@@ -86,6 +86,11 @@ class MainWindow(QMainWindow):
         self.login_screen.sign_in_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(2)) #File Pick
         self.login_screen.sign_up_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(1)) #Sign up
 
+        self.button_size.clicked.connect(lambda: self.snip_screen.player.pause())
+        self.button_size.clicked.connect(lambda: self.snip_screen.play_button.setChecked(False))
+        self.button_save.clicked.connect(lambda: self.snip_screen.player.pause())
+        self.button_save.clicked.connect(lambda: self.snip_screen.play_button.setChecked(False))
+
 
     def create_menu(self):
         """Generates native system menu navigation entries"""
@@ -96,11 +101,17 @@ class MainWindow(QMainWindow):
         sign_out.triggered.connect(lambda: self.master_stack.setCurrentIndex(0))
         sign_out.triggered.connect(lambda: self.login_stack.setCurrentIndex(0))
         sign_out.triggered.connect(lambda: self.main_workflow_stack.setCurrentIndex(0))
+        sign_out.triggered.connect(lambda: self.snip_screen.play_button.setChecked(False))
+        sign_out.triggered.connect(lambda: self.snip_screen.player.pause())
+        
         
         new_project = settings_menu.addAction("&New Project")
         new_project.triggered.connect(lambda: self.master_stack.setCurrentIndex(0))
         new_project.triggered.connect(lambda: self.login_stack.setCurrentIndex(3))
         sign_out.triggered.connect(lambda: self.main_workflow_stack.setCurrentIndex(0))
+        new_project.triggered.connect(lambda: self.snip_screen.play_button.setChecked(False))
+        new_project.triggered.connect(lambda: self.snip_screen.player.pause())
+                
 
     
 

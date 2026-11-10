@@ -139,6 +139,7 @@ class SelectFile(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
+        #TODO: Add more robust error handling
         layout = QVBoxLayout(self)
 
         layout.addStretch()
@@ -617,7 +618,7 @@ class SimpleSizeScreen(QWidget):
         self.size_increment_hbox.addWidget(self.size_increment_num)
 
         self.size_increment_dropdown = QComboBox()
-        self.size_increment_dropdown.addItems(["KB","MB"])
+        self.size_increment_dropdown.addItems(["Kbps","Mbps"])
         self.size_increment_dropdown.setCurrentIndex(0)
         self.size_increment_hbox.addWidget(self.size_increment_dropdown)
 
@@ -673,7 +674,7 @@ class SimpleSizeScreen(QWidget):
         self.size_select_hbox.addWidget(self.size_select_num)
 
         self.size_select_dropdown = QComboBox()
-        self.size_select_dropdown.addItems(["KB","MB","GB"])
+        self.size_select_dropdown.addItems(["Kbps","Mbps","Gbps"])
         self.size_select_dropdown.setCurrentIndex(0)
         self.size_select_hbox.addWidget(self.size_select_dropdown)
 
@@ -758,11 +759,7 @@ class SaveScreen(QWidget):
             main_window.master_stack.setCurrentIndex(0)
             main_window.login_stack.setCurrentIndex(3)
             main_window.main_workflow_stack.setCurrentIndex(0)
-
-        
-
-
-
+            self.file_name.setText(None)
 
 class AdvancedSizeScreen(QWidget):
     def __init__(self, parent=None):
