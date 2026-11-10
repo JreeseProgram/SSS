@@ -534,6 +534,10 @@ class SimpleSizeScreen(QWidget):
         layout.addLayout(self.select_size_layout)
         layout.addStretch()
 
+        self.advanced_button = QPushButton()
+        self.advanced_button.setText("Advanced")
+        layout.addWidget(self.advanced_button)
+
 
 
 
