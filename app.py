@@ -2,7 +2,7 @@ import sys
 from PySide6.QtCore import QUrl
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
-from page_layouts import SnipScreen, SimpleSizeScreen 
+from page_layouts import SnipScreen, SimpleSizeScreen, SaveScreen
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -11,11 +11,14 @@ class MainWindow(QMainWindow):
         self.resize(800, 550)
 
         #self.snip_screen = SnipScreen(self)
-        self.simple_size_screen = SimpleSizeScreen()
+        #self.simple_size_screen = SimpleSizeScreen()
+        self.saves_screen = SaveScreen()
+
         self.media_path = None
         #TODO: make a dummy widget
         #self.setCentralWidget(self.snip_screen)
-        self.setCentralWidget(self.simple_size_screen)
+        #self.setCentralWidget(self.simple_size_screen)
+        self.setCentralWidget(self.saves_screen)
 
         #self.snip_screen.player.durationChanged.connect(self.snip_screen.handle_duration_change)
         #self.snip_screen.player.positionChanged.connect(self.snip_screen.handle_position_change)

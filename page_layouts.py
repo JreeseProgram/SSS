@@ -1,5 +1,5 @@
 from PySide6.QtCore import QThreadPool, QTime, Qt
-from PySide6.QtWidgets import QButtonGroup, QComboBox, QGridLayout, QRadioButton, QStackedLayout, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSlider, QLineEdit
+from PySide6.QtWidgets import QButtonGroup, QComboBox, QFileDialog, QGridLayout, QMessageBox, QRadioButton, QStackedLayout, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSlider, QLineEdit
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from pymediainfo import MediaInfo
@@ -401,8 +401,6 @@ class SnipScreen(QWidget):
                 self.final_start_bound = start_ms
                 self.snip_end.setText(self.format_time(end_ms))
                 self.final_end_bound = end_ms
-  
-    
 
 class SimpleSizeScreen(QWidget):
     def __init__(self, parent=None):
@@ -538,6 +536,76 @@ class SimpleSizeScreen(QWidget):
         self.advanced_button.setText("Advanced")
         layout.addWidget(self.advanced_button)
 
+class SaveScreen(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        layout = QVBoxLayout(self)
+        layout.addSpacing(50)
+
+        self.header = QLabel()
+        self.header.setText("Enter in File Name:")
+        self.header.setStyleSheet("font-weight: bold; font-size: 30px;")
+        self.header.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.header)
+        layout.addSpacing(30)
+
+        self.center_file_name = QHBoxLayout()
+        self.center_file_name.addStretch()
+        self.file_name = QLineEdit()
+        self.file_name.setMaximumWidth(400)
+        self.center_file_name.addWidget(self.file_name)
+        self.center_file_name.addStretch()
+        layout.addLayout(self.center_file_name)
+        layout.addSpacing(100)
+
+        self.buttons = QHBoxLayout()
+        self.buttons.addStretch()
+
+        self.quick_button = QPushButton("Quick\nExport")
+        self.quick_button.setFixedSize(100,50)
+        self.quick_button.clicked.connect(self.finished_popup)
+        self.buttons.addWidget(self.quick_button)
+        #TODO: Hookup File Browser
+        
+        self.buttons.addSpacing(50)
+
+        self.export_button = QPushButton("Export\nTo...")
+        self.export_button.setFixedSize(100,50)
+        self.export_button.clicked.connect(self.open_file_dialog)
+        self.buttons.addWidget(self.export_button)
+        #TODO: Hookup File Browser
+        self.buttons.addStretch()
+
+        layout.addLayout(self.buttons)
+        layout.addSpacing(100)
+
+    def open_file_dialog(self):
+        default_name = self.file_name.text() if self.file_name.text() else "untitled"
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save File",
+            default_name,
+            "Video Files (*.mp4, *.mkv, *.mov)"
+        )
+
+        if file_path:
+            print(file_path)
+            self.finished_popup()
+
+    def finished_popup(self):
+        message_box = QMessageBox(self)
+        message_box.setWindowTitle("Export Complete!")
+        message_box.setText("Your Video Has been Saved")
+
+        new_project=message_box.addButton("Start New Project", QMessageBox.AcceptRole) # TODO: Hook this up to open new file load
+        remain=message_box.addButton("Remain in project", QMessageBox.RejectRole)
+
+        message_box.setDefaultButton(remain)
+
+        message_box.exec()
+
+        
 
 
 
