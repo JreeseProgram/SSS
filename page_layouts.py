@@ -68,13 +68,6 @@ class LoginScreen(QWidget):
         layout.addLayout(self.center_sign_up)
         layout.addStretch()
 
-
-
-        
-
-
-
-
 class SignUpScreen(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -160,7 +153,6 @@ class SelectFile(QWidget):
         layout.addStretch()
 
     def open_file_dialog(self):
-            """Triggers local file browser dialog context"""
 
             main_window = self.window()
             file_path, _ = QFileDialog.getOpenFileName(
@@ -169,7 +161,9 @@ class SelectFile(QWidget):
             if file_path:
                 main_window.media_path = file_path
                 main_window.snip_screen.player.setSource(QUrl.fromLocalFile(file_path))
-                main_window.snip_screen.player.pause() # Stage the initial clip frame onto our player surface
+                main_window.snip_screen.player.pause() 
+                
+                main_window.master_stack.setCurrentIndex(1)
 
 class SnipScreen(QWidget):
     def __init__(self, parent=None):
