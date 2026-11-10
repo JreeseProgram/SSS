@@ -2,7 +2,7 @@ import sys
 from PySide6.QtCore import QUrl
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
-from page_layouts import SnipScreen 
+from page_layouts import SnipScreen, SimpleSizeScreen 
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -10,14 +10,15 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("SSS")
         self.resize(800, 550)
 
-        self.snip_screen = SnipScreen(self)
-
+        #self.snip_screen = SnipScreen(self)
+        self.simple_size_screen = SimpleSizeScreen()
         self.media_path = None
         #TODO: make a dummy widget
-        self.setCentralWidget(self.snip_screen)
+        #self.setCentralWidget(self.snip_screen)
+        self.setCentralWidget(self.simple_size_screen)
 
-        self.snip_screen.player.durationChanged.connect(self.snip_screen.handle_duration_change)
-        self.snip_screen.player.positionChanged.connect(self.snip_screen.handle_position_change)
+        #self.snip_screen.player.durationChanged.connect(self.snip_screen.handle_duration_change)
+        #self.snip_screen.player.positionChanged.connect(self.snip_screen.handle_position_change)
 
 
         # 3. Create a top system drop-down file menu

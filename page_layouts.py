@@ -1,10 +1,11 @@
 from PySide6.QtCore import QThreadPool, QTime, Qt
-from PySide6.QtWidgets import QGridLayout, QStackedLayout, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSlider, QLineEdit
+from PySide6.QtWidgets import QButtonGroup, QComboBox, QGridLayout, QRadioButton, QStackedLayout, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSlider, QLineEdit
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from pymediainfo import MediaInfo
 from video_helpers import CreateThumbnails
-from superqt import QLabeledRangeSlider, QRangeSlider
+from superqt import QLabeledRangeSlider, QLabeledSlider, QRangeSlider
+from PySide6.QtGui import QIntValidator
 
 class LoginScreen(QWidget):
     def __init__(self, parent=None):
@@ -406,7 +407,136 @@ class SnipScreen(QWidget):
 class SimpleSizeScreen(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        #TODO: Add Later
+        layout = QVBoxLayout(self)
+
+        self.selected_option = QButtonGroup(self)
+    # top predicted Size
+        self.size_info = QHBoxLayout()
+        self.size_info_list = QVBoxLayout()
+        #left half
+        self.predicted_size_label = QLabel()
+        self.predicted_size_label.setText("Predicted Size: ##.## MB")
+        self.size_info.addWidget(self.predicted_size_label)
+
+        #right half
+        self.predicted_resolution = QLabel()
+        self.predicted_resolution.setText("Resolution: ####x####")
+        self.size_info_list.addWidget(self.predicted_resolution)
+
+        self.predicted_fps = QLabel()
+        self.predicted_fps.setText("Frame Rate: ##FPS")
+        self.size_info_list.addWidget(self.predicted_fps)
+
+        self.predicted_codec = QLabel()
+        self.predicted_codec.setText("Codec: H.265")
+        self.size_info_list.addWidget(self.predicted_codec)
+
+        self.predicted_bitrate = QLabel()
+        self.predicted_bitrate.setText("Bitrate: ## Mbps")
+        self.size_info_list.addWidget(self.predicted_bitrate)
+
+        self.size_info.addLayout(self.size_info_list)
+
+        layout.addLayout(self.size_info)
+        layout.addStretch()
+    #Desired Bitrate
+        self.desired_bitrate_layout = QVBoxLayout()
+
+
+        self.center_radio1 = QHBoxLayout()
+        self.center_radio1.addStretch()
+        self.desired_bitrate_radio = QRadioButton()
+        self.selected_option.addButton(self.desired_bitrate_radio)
+        self.center_radio1.addWidget(self.desired_bitrate_radio)
+        self.desired_bitrate_radio.setChecked(True)
+        self.center_radio1.addStretch()
+        self.desired_bitrate_layout.addLayout(self.center_radio1)
+
+        self.desired_size_label = QLabel()
+        self.desired_size_label.setAlignment(Qt.AlignCenter)
+        self.desired_size_label.setText("Select Desired Bitrate:")
+        self.desired_size_label.setStyleSheet("font-weight: bold; font-size: 30px;")
+        self.desired_bitrate_layout.addWidget(self.desired_size_label)
+
+        self.size_increment_hbox = QHBoxLayout()
+
+        self.size_increment_label = QLabel()
+        self.size_increment_label.setText("Size Increment: ")
+        self.size_increment_hbox.addWidget(self.size_increment_label)
+
+        self.size_increment_num = QLineEdit()
+        self.size_increment_num.setValidator(QIntValidator(0,9999999,self))
+        self.size_increment_num.setText("5")
+        self.size_increment_hbox.addWidget(self.size_increment_num)
+
+        self.size_increment_dropdown = QComboBox()
+        self.size_increment_dropdown.addItems(["KB","MB"])
+        self.size_increment_dropdown.setCurrentIndex(0)
+        self.size_increment_hbox.addWidget(self.size_increment_dropdown)
+
+        self.desired_bitrate_layout.addLayout(self.size_increment_hbox)
+
+        self.size_increment_slider = QLabeledSlider(Qt.Horizontal)
+        self.size_increment_slider.setRange(0, 100)
+        self.size_increment_slider.setValue(5)
+        self.size_increment_slider.setSingleStep(5)
+        self.size_increment_slider.setPageStep(5)
+        self.size_increment_slider.setTickPosition(QSlider.TicksAbove)
+        self.size_increment_slider.setTickInterval(5)
+        self.desired_bitrate_layout.addWidget(self.size_increment_slider)
+
+        layout.addLayout(self.desired_bitrate_layout)
+        layout.addStretch()
+
+        #Big OR
+
+        self.or_label = QLabel()
+        self.or_label.setText("-----OR-----")
+        self.or_label.setStyleSheet("font-weight: bold; font-size: 50px;")
+        self.or_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.or_label)
+        layout.addStretch()
+
+        #Bottom Desired Size
+        self.select_size_layout = QVBoxLayout()
+
+        self.center_radio2 = QHBoxLayout()
+        self.center_radio2.addStretch()
+        self.desired_size_radio = QRadioButton()
+        self.selected_option.addButton(self.desired_size_radio)
+        self.center_radio2.addWidget(self.desired_size_radio)
+        self.center_radio2.addStretch()
+        self.select_size_layout.addLayout(self.center_radio2)
+
+        self.desired_size_label2 = QLabel()
+        self.desired_size_label2.setAlignment(Qt.AlignCenter)
+        self.desired_size_label2.setStyleSheet("font-weight: bold; font-size: 30px;")
+        self.desired_size_label2.setText("Select Desired Size:")
+        self.select_size_layout.addWidget(self.desired_size_label2)
+
+        self.size_select_hbox = QHBoxLayout()
+
+        self.size_select_label = QLabel()
+        self.size_select_label.setText("Desired Output Size: ")
+        self.size_select_hbox.addWidget(self.size_select_label)
+
+        self.size_select_num = QLineEdit()
+        self.size_select_num.setValidator(QIntValidator(0,9999999,self))
+        self.size_select_num.setText("5")
+        self.size_select_hbox.addWidget(self.size_select_num)
+
+        self.size_select_dropdown = QComboBox()
+        self.size_select_dropdown.addItems(["KB","MB","GB"])
+        self.size_select_dropdown.setCurrentIndex(0)
+        self.size_select_hbox.addWidget(self.size_select_dropdown)
+
+        self.select_size_layout.addLayout(self.size_select_hbox)
+        layout.addLayout(self.select_size_layout)
+        layout.addStretch()
+
+
+
+
 
 class AdvancedSizeScreen(QWidget):
     def __init__(self, parent=None):
