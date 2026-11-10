@@ -597,14 +597,14 @@ class SimpleSizeScreen(QWidget):
         self.selected_option.addButton(self.desired_bitrate_radio)
         self.center_radio1.addWidget(self.desired_bitrate_radio)
         self.desired_bitrate_radio.setChecked(True)
-        self.center_radio1.addStretch()
-        self.desired_bitrate_layout.addLayout(self.center_radio1)
 
         self.desired_size_label = QLabel()
         self.desired_size_label.setAlignment(Qt.AlignCenter)
         self.desired_size_label.setText("Select Desired Bitrate:")
         self.desired_size_label.setStyleSheet("font-weight: bold; font-size: 30px;")
-        self.desired_bitrate_layout.addWidget(self.desired_size_label)
+        self.center_radio1.addWidget(self.desired_size_label)
+        self.center_radio1.addStretch()
+        self.desired_bitrate_layout.addLayout(self.center_radio1)
 
         self.size_increment_hbox = QHBoxLayout()
 
@@ -653,14 +653,13 @@ class SimpleSizeScreen(QWidget):
         self.desired_size_radio = QRadioButton()
         self.selected_option.addButton(self.desired_size_radio)
         self.center_radio2.addWidget(self.desired_size_radio)
-        self.center_radio2.addStretch()
         self.select_size_layout.addLayout(self.center_radio2)
 
         self.desired_size_label2 = QLabel()
-        self.desired_size_label2.setAlignment(Qt.AlignCenter)
         self.desired_size_label2.setStyleSheet("font-weight: bold; font-size: 30px;")
         self.desired_size_label2.setText("Select Desired Size:")
-        self.select_size_layout.addWidget(self.desired_size_label2)
+        self.center_radio2.addWidget(self.desired_size_label2)
+        self.center_radio2.addStretch()
 
         self.size_select_hbox = QHBoxLayout()
 
@@ -685,6 +684,66 @@ class SimpleSizeScreen(QWidget):
         self.advanced_button = QPushButton()
         self.advanced_button.setText("Advanced")
         layout.addWidget(self.advanced_button)
+
+    #Connections
+        self.size_increment_slider.valueChanged.connect(self.calc_bitrate)
+        self.size_increment_num.textChanged.connect(self.calc_bitrate)
+        self.size_select_num.textChanged.connect(self.calc_bitrate)
+
+        self.size_increment_dropdown.currentTextChanged.connect(self.calc_bitrate)
+        self.size_select_dropdown.currentTextChanged.connect(self.calc_bitrate)
+
+        self.desired_bitrate_radio.toggled.connect(self.handle_radio_toggle_sync)
+        self.desired_size_radio.toggled.connect(self.handle_radio_toggle_sync)
+
+        self.handle_radio_toggle_sync()
+        self.calc_bitrate()
+
+    def calc_bitrate(self):
+        main_window = self.window()
+
+        duration_seconds = main_window.snip_screen.player.duration() / 1000.0
+
+        if self.desired_bitrate_radio.isChecked():
+            bitrate_mbps = float(self.size_increment_slider.value())
+
+            self.predicted_bitrate.setText(f"Bitrate: {int(bitrate_mbps)} {self.size_increment_dropdown.currentText()}")
+        else: 
+            try:
+                desired_size = float(self.size_select_num.text())
+            except ValueError:
+                desired_size = 0.0
+                
+            unit = self.size_select_dropdown.currentText()
+            if unit == "KB":
+                bitrate_mbps = (desired_size * 8) / (1024.0 * duration_seconds) if duration_seconds > 0 else 0
+            elif unit == "GB":
+                bitrate_mbps = (desired_size * 8 * 1024.0) / duration_seconds if duration_seconds > 0 else 0
+            else:
+                bitrate_mbps = (desired_size * 8) / duration_seconds if duration_seconds > 0 else 0
+                
+            self.predicted_bitrate.setText(f"Bitrate: {bitrate_mbps:.2f} Mbps")
+        
+        final_size = (bitrate_mbps * duration_seconds) / 8.0
+
+        final_measure = "Mbps" if self.desired_bitrate_radio.isChecked() else self.size_select_dropdown.currentText()
+
+        self.predicted_size_label.setText(f"Predicted Size: {final_size:.2f} {final_measure}")
+
+    def handle_radio_toggle_sync(self):
+        """Toggle usability based off selection"""
+        is_bitrate = self.desired_bitrate_radio.isChecked()
+
+        self.size_increment_num.setEnabled(is_bitrate)
+        self.size_increment_dropdown.setEnabled(is_bitrate)
+        self.size_increment_slider.setEnabled(is_bitrate)
+
+        self.size_select_num.setEnabled(not is_bitrate)
+        self.size_select_dropdown.setEnabled(not is_bitrate)
+
+        
+
+
 
 class SaveScreen(QWidget):
     def __init__(self, parent=None):
