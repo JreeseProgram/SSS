@@ -1,5 +1,5 @@
-from PySide6.QtCore import QThreadPool, QTime, Qt
-from PySide6.QtWidgets import QButtonGroup, QComboBox, QFileDialog, QGridLayout, QMessageBox, QRadioButton, QStackedLayout, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSlider, QLineEdit
+from PySide6.QtCore import QThreadPool, QTime, QUrl, Qt
+from PySide6.QtWidgets import QButtonGroup, QCheckBox, QComboBox, QFileDialog, QGridLayout, QMessageBox, QRadioButton, QStackedLayout, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSlider, QLineEdit
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from pymediainfo import MediaInfo
@@ -10,17 +10,166 @@ from PySide6.QtGui import QIntValidator
 class LoginScreen(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        #TODO: Add Later
+
+        layout = QVBoxLayout(self)
+        layout.addStretch()
+
+        self.sign_in_label = QLabel()
+        self.sign_in_label.setAlignment(Qt.AlignCenter)
+        self.sign_in_label.setText("Sign In")
+        self.sign_in_label.setStyleSheet("font-weight: bold; font-size: 30px;")
+        layout.addWidget(self.sign_in_label)
+        layout.addSpacing(30)
+
+        self.center_username = QHBoxLayout()
+        self.center_username.addStretch()
+        self.username_field = QLineEdit()
+        self.username_field.setPlaceholderText("Username")
+        self.username_field.setMinimumWidth(250)
+        self.center_username.addWidget(self.username_field)
+        self.center_username.addStretch()
+        
+
+        layout.addLayout(self.center_username)
+        layout.addSpacing(25)
+
+        self.center_password = QHBoxLayout()
+        self.center_password.addStretch()
+        self.password_field = QLineEdit()
+        self.password_field.setPlaceholderText("Password")
+        self.password_field.setMinimumWidth(250)
+        self.center_password.addWidget(self.password_field)
+        self.center_password.addStretch()
+
+        layout.addLayout(self.center_password)
+        layout.addSpacing(100)
+
+        self.center_sign_button = QHBoxLayout()
+        self.center_sign_button.addStretch()
+        self.sign_in_button = QPushButton("Sign In")
+        self.center_sign_button.addWidget(self.sign_in_button)
+        self.center_sign_button.addStretch()
+
+        layout.addLayout(self.center_sign_button)
+        layout.addSpacing(10)
+
+        self.sign_up_label = QLabel()
+        self.sign_up_label.setAlignment(Qt.AlignCenter)
+        self.sign_up_label.setText("Not a User?")
+        self.sign_up_label.setStyleSheet("font-weight: bold; font-size: 30px;")
+        layout.addWidget(self.sign_up_label)
+        layout.addSpacing(50)
+
+        self.center_sign_up = QHBoxLayout()
+        self.center_sign_up.addStretch()
+        self.sign_up_button = QPushButton("Sign Up Here")
+        self.center_sign_up.addWidget(self.sign_up_button)
+        self.center_sign_up.addStretch()
+        layout.addLayout(self.center_sign_up)
+        layout.addStretch()
+
+
+
+        
+
+
+
 
 class SignUpScreen(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        #TODO: Add Later
+        
+        layout = QVBoxLayout(self)
+        layout.addSpacing(70)
+
+        self.sign_up_label = QLabel()
+        self.sign_up_label.setAlignment(Qt.AlignCenter)
+        self.sign_up_label.setText("Sign Up")
+        self.sign_up_label.setStyleSheet("font-weight: bold; font-size: 30px;")
+        layout.addWidget(self.sign_up_label)
+        layout.addSpacing(30)
+
+        self.center_email = QHBoxLayout()
+        self.center_email.addStretch()
+        self.email_field = QLineEdit()
+        self.email_field.setPlaceholderText("Email")
+        self.email_field.setMinimumWidth(250)
+        self.center_email.addWidget(self.email_field)
+        self.center_email.addStretch()
+        layout.addLayout(self.center_email)
+        layout.addSpacing(25)
+
+        self.center_username = QHBoxLayout()
+        self.center_username.addStretch()
+        self.username_field = QLineEdit()
+        self.username_field.setPlaceholderText("Username")
+        self.username_field.setMinimumWidth(250)
+        self.center_username.addWidget(self.username_field)
+        self.center_username.addStretch()
+        
+
+        layout.addLayout(self.center_username)
+        layout.addSpacing(25)
+
+        self.center_password = QHBoxLayout()
+        self.center_password.addStretch()
+        self.password_field = QLineEdit()
+        self.password_field.setPlaceholderText("Password")
+        self.password_field.setMinimumWidth(250)
+        self.center_password.addWidget(self.password_field)
+        self.center_password.addStretch()
+
+        layout.addLayout(self.center_password)
+        layout.addSpacing(100)
+
+        self.t_and_c = QHBoxLayout()
+        self.t_and_c.addStretch()
+        self.box = QCheckBox()
+        self.t_and_c.addWidget(self.box)
+
+        self.agree = QLabel()
+        self.agree.setText("I Agree to the Terms and Conditions")
+        self.t_and_c.addWidget(self.agree)
+        self.t_and_c.addStretch()
+        layout.addLayout(self.t_and_c)
+
+
+        self.center_sign_up = QHBoxLayout()
+        self.center_sign_up.addStretch()
+        self.sign_up_button = QPushButton("Sign Up")
+        self.center_sign_up.addWidget(self.sign_up_button)
+        self.center_sign_up.addStretch()
+        layout.addLayout(self.center_sign_up)
+        layout.addStretch()
 
 class SelectFile(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        #TODO: add Later
+
+        layout = QVBoxLayout(self)
+
+        layout.addStretch()
+        self.button_center = QHBoxLayout()
+        self.button_center.addStretch()
+        self.button = QPushButton("Select Your File")
+        self.button.clicked.connect(self.open_file_dialog)
+        self.button_center.addWidget(self.button)
+        self.button_center.addStretch()
+
+        layout.addLayout(self.button_center)
+        layout.addStretch()
+
+    def open_file_dialog(self):
+            """Triggers local file browser dialog context"""
+
+            main_window = self.window()
+            file_path, _ = QFileDialog.getOpenFileName(
+                self, "Select Video Container", "", "Video Files (*.mp4 *.mov *.avi *.mkv)"
+            )
+            if file_path:
+                main_window.media_path = file_path
+                main_window.snip_screen.player.setSource(QUrl.fromLocalFile(file_path))
+                main_window.snip_screen.player.pause() # Stage the initial clip frame onto our player surface
 
 class SnipScreen(QWidget):
     def __init__(self, parent=None):
