@@ -302,7 +302,8 @@ class SnipScreen(QWidget):
 
             label.setStyleSheet("background-color: #222222; border-right: 1px solid #111111;")
             label.setAlignment(Qt.AlignCenter)
-            label.setFixedSize(80,45)
+            label.setMinimumSize(10,45)
+            label.setFixedHeight(45)
             self.thumbnail_layout.addWidget(label)
             self.thumbnails.append(label)
 
@@ -417,7 +418,7 @@ class SnipScreen(QWidget):
         if index < len(self.thumbnails):
             scaled_pixmap = pixmap.scaled(
                 self.thumbnails[index].size(),
-                Qt.KeepAspectRatioByExpanding,
+                Qt.KeepAspectRatio,
                 Qt.SmoothTransformation
             )
             self.thumbnails[index].setPixmap(scaled_pixmap)
@@ -487,10 +488,6 @@ class SnipScreen(QWidget):
                 }
             """)
 
-            self.snip_start.setStyleSheet("")
-            self.snip_end.setStyleSheet("")
-            self.snip_start.setEnabled(True)
-            self.snip_end.setEnabled(True)
             
             vals = self.playback_bar.value()
             if len(vals) == 3:
@@ -515,10 +512,6 @@ class SnipScreen(QWidget):
                     margin: 0px;
                 }
             """)
-            self.snip_start.setStyleSheet("background: transparent; border: 2px solid transparent; color: transparent")
-            self.snip_end.setStyleSheet("background: transparent; border: 2px solid transparent; color: transparent")
-            self.snip_start.setEnabled(False)
-            self.snip_end.setEnabled(False)
 
     def handle_timeline_value_changes(self, values_tuple):
         if not self.frame_time: return
@@ -551,6 +544,12 @@ class SnipScreen(QWidget):
                 self.final_start_bound = start_ms
                 self.snip_end.setText(self.format_time(end_ms))
                 self.final_end_bound = end_ms
+
+    def playback_state_change(self, state):
+        if state == QMediaPlayer.PlayingState:
+            self.play_button.setChecked(True)
+        else:
+            self.play_button.setChecked(False)
 
 class SimpleSizeScreen(QWidget):
     def __init__(self, parent=None):

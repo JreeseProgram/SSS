@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
         self.button_size.clicked.connect(lambda: self.main_workflow_stack.setCurrentIndex(1))
         self.button_save.clicked.connect(lambda: self.main_workflow_stack.setCurrentIndex(2))
 
-        
+        self.snip_screen.player.playbackStateChanged.connect(self.snip_screen.playback_state_change)
         
 
         self.master_stack.addWidget(self.login_stack) # [0]
@@ -61,19 +61,7 @@ class MainWindow(QMainWindow):
         self.login_stack.setCurrentIndex(0)
         self.main_workflow_stack.setCurrentIndex(0)
 
-        
-        #TODO: make a dummy widget
-        #self.setCentralWidget(self.snip_screen)
-        #self.setCentralWidget(self.simple_size_screen)
-        #self.setCentralWidget(self.saves_screen)
-        #self.setCentralWidget(self.login_screen)
-        #self.setCentralWidget(self.signup_screen)
-        #self.setCentralWidget(self.file_select)
-
     #Connections
-
-        
-
         self.bind_navigation_routes()
         self.create_menu()
 
