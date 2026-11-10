@@ -360,7 +360,9 @@ class SnipScreen(QWidget):
     
     def back_frame(self):
         """Sends the video player back by one frame"""
-        if not self.parent().media_path:
+
+        main_window = self.window()
+        if not main_window.media_path:
             return
         
         new_time = self.player.position() - self.frame_time
@@ -368,8 +370,8 @@ class SnipScreen(QWidget):
 
     def fwd_frame(self):
         """Sends the video player forward by one frame"""
-        
-        if not self.parent().media_path:
+        main_window = self.window()
+        if not main_window.media_path:
             return
         
         
@@ -378,13 +380,14 @@ class SnipScreen(QWidget):
 
     def handle_duration_change(self, duration_ms):
         """Adds ranges and time"""
+        main_window = self.window()
         self.playback_bar.setRange(0, duration_ms)
         self.playback_bar.setValue((0,1,duration_ms))
 
         self.final_start_bound = 0
         self.final_end_bound = duration_ms
 
-        media_info = MediaInfo.parse(self.parent().media_path)
+        media_info = MediaInfo.parse(main_window.media_path)
         track = next((t for t in media_info.tracks if t.track_type == "Video"),None)
         self.frame_rate = float(track.frame_rate)
 
@@ -400,8 +403,10 @@ class SnipScreen(QWidget):
         for label in self.thumbnails:
             label.clear()
             label.setStyleSheet("background-color: #222222; border-right: 1px solid #111111;")
+        
+        main_window = self.window()
 
-        self.active_thumbnail_worker = CreateThumbnails(self.parent().media_path, duration_ms)
+        self.active_thumbnail_worker = CreateThumbnails(main_window.media_path, duration_ms)
 
         self.active_thumbnail_worker.signals.frame_ready.connect(self.update_thumbnails)
 
@@ -442,7 +447,8 @@ class SnipScreen(QWidget):
 
     def set_player_position(self, playhead_ms):
         """Sets player position to a target ms"""
-        if not self.parent().media_path or not self.frame_time:
+        main_window = self.window()
+        if not main_window.media_path or not self.frame_time:
             return
         math_corrected_target = self.frame_time_helper(playhead_ms)
         self.player.setPosition(math_corrected_target)
@@ -561,11 +567,11 @@ class SimpleSizeScreen(QWidget):
 
         #right half
         self.predicted_resolution = QLabel()
-        self.predicted_resolution.setText("Resolution: ####x####")
+        self.predicted_resolution.setText("Resolution: 1920x1080")
         self.size_info_list.addWidget(self.predicted_resolution)
 
         self.predicted_fps = QLabel()
-        self.predicted_fps.setText("Frame Rate: ##FPS")
+        self.predicted_fps.setText("Frame Rate: 30FPS")
         self.size_info_list.addWidget(self.predicted_fps)
 
         self.predicted_codec = QLabel()
@@ -709,7 +715,6 @@ class SaveScreen(QWidget):
         self.quick_button.setFixedSize(100,50)
         self.quick_button.clicked.connect(self.finished_popup)
         self.buttons.addWidget(self.quick_button)
-        #TODO: Hookup File Browser
         
         self.buttons.addSpacing(50)
 
@@ -717,7 +722,6 @@ class SaveScreen(QWidget):
         self.export_button.setFixedSize(100,50)
         self.export_button.clicked.connect(self.open_file_dialog)
         self.buttons.addWidget(self.export_button)
-        #TODO: Hookup File Browser
         self.buttons.addStretch()
 
         layout.addLayout(self.buttons)
@@ -741,12 +745,19 @@ class SaveScreen(QWidget):
         message_box.setWindowTitle("Export Complete!")
         message_box.setText("Your Video Has been Saved")
 
+        
         new_project=message_box.addButton("Start New Project", QMessageBox.AcceptRole) # TODO: Hook this up to open new file load
         remain=message_box.addButton("Remain in project", QMessageBox.RejectRole)
 
         message_box.setDefaultButton(remain)
 
         message_box.exec()
+
+        if message_box.clickedButton() == new_project:
+            main_window = self.window()
+            main_window.master_stack.setCurrentIndex(0)
+            main_window.login_stack.setCurrentIndex(3)
+            main_window.main_workflow_stack.setCurrentIndex(0)
 
         
 

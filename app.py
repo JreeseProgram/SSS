@@ -72,26 +72,20 @@ class MainWindow(QMainWindow):
 
     #Connections
 
-        self.signup_screen.sign_up_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(2))
-
-        self.snip_screen.player.durationChanged.connect(self.snip_screen.handle_duration_change)
-        self.snip_screen.player.positionChanged.connect(self.snip_screen.handle_position_change)
+        
 
         self.bind_navigation_routes()
         self.create_menu()
 
     def bind_navigation_routes(self):
-        # Flow A: Login branches
-        self.login_screen.sign_in_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(2)) # -> File Pick
-        self.login_screen.sign_up_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(1)) # -> Sign Up
+        self.signup_screen.sign_up_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(2))
+        
+        self.snip_screen.player.durationChanged.connect(self.snip_screen.handle_duration_change)
+        self.snip_screen.player.positionChanged.connect(self.snip_screen.handle_position_change)
 
-        # Flow B: Sign Up branches
-        # Assumes your signup layout has a completion button. Adjust the attribute name if different!
-        if hasattr(self.signup_screen, 'register_button'):
-            self.signup_screen.register_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(2)) # -> File Pick
-        # Fallback helper path back down to sign-in card context
-        if hasattr(self.signup_screen, 'back_to_login_button'):
-            self.signup_screen.back_to_login_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(0))
+        self.login_screen.sign_in_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(2)) #File Pick
+        self.login_screen.sign_up_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(1)) #Sign up
+
 
     def create_menu(self):
         """Generates native system menu navigation entries"""
