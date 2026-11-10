@@ -1,4 +1,5 @@
 import subprocess
+import os
 from PySide6.QtCore import QObject, QRunnable, QThread, Signal
 from PySide6.QtGui import QImage, QPixmap
 
@@ -37,8 +38,15 @@ class CreateThumbnails(QRunnable):
                 'pipe:1'
             ]
 
+            startup_info = subprocess.STARTUPINFO()
+            startup_info.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
             try:
-                process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                process = subprocess.Popen(
+                    cmd, 
+                    stdout=subprocess.PIPE, 
+                    stderr=subprocess.PIPE,
+                    startupinfo=startup_info)
                 stdout, _ = process.communicate()
 
                 q_img = QImage.fromData(stdout)
