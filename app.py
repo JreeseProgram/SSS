@@ -1,125 +1,53 @@
 import sys
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-    QPushButton, QLabel, QStackedWidget
-)
+from PySide6.QtCore import QUrl
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+from page_layouts import SnipScreen 
 
-class MultiPageApp(QMainWindow):
+class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowTitle("SSS")
+        self.resize(800, 550)
 
-        self.setWindowTitle("Multi-Page Video Suite")
-        self.resize(800, 500)
+        self.snip_screen = SnipScreen(self)
 
-        # 1. Master Layout Setup
-        # Like before, we need a central widget and a layout to split the screen left-to-right
-        self.central_widget = QWidget(self)
-        self.setCentralWidget(self.central_widget)
-        self.split_layout = QHBoxLayout(self.central_widget)
-        self.split_layout.setContentsMargins(0, 0, 0, 0) # Edge-to-edge look
-        self.split_layout.setSpacing(0)
+        self.media_path = None
+        #TODO: make a dummy widget
+        self.setCentralWidget(self.snip_screen)
 
-        # ==========================================
-        # LEFT PANEL: Navigation Sidebar
-        # ==========================================
-        self.sidebar_frame = QWidget()
-        self.sidebar_frame.setFixedWidth(180)
-        self.sidebar_frame.setStyleSheet("background-color: #202020;")
+        self.snip_screen.player.durationChanged.connect(self.snip_screen.handle_duration_change)
+        self.snip_screen.player.positionChanged.connect(self.snip_screen.handle_position_change)
+
+
+        # 3. Create a top system drop-down file menu
+        self.create_menu()
+
+
+    def create_menu(self):
+        """Generates native system menu navigation entries"""
+        menu_bar = self.menuBar()
+        file_menu = menu_bar.addMenu("&File")
         
-        self.sidebar_layout = QVBoxLayout(self.sidebar_frame)
-        self.sidebar_layout.setContentsMargins(10, 20, 10, 20)
-        self.sidebar_layout.setSpacing(10)
-
-        # Create the navigation buttons
-        self.nav_home_btn = QPushButton("🏠 Home Dash")
-        self.nav_trim_btn = QPushButton("🎥 Video Trimmer")
-        self.nav_settings_btn = QPushButton("⚙️ Settings")
-
-        # Style the buttons to look clean in the dark sidebar
-        btn_style = "QPushButton { color: white; padding: 10px; text-align: left; background: transparent; border: none; font-size: 13px; } QPushButton:hover { background-color: #333333; border-radius: 4px; }"
-        for btn in [self.nav_home_btn, self.nav_trim_btn, self.nav_settings_btn]:
-            btn.setStyleSheet(btn_style)
-
-        # Add buttons to the sidebar
-        self.sidebar_layout.addWidget(self.nav_home_btn)
-        self.sidebar_layout.addWidget(self.nav_trim_btn)
-        self.sidebar_layout.addWidget(self.nav_settings_btn)
-        self.sidebar_layout.addStretch() # Push everything to the top
-
-        # Mount the sidebar into our master split screen
-        self.split_layout.addWidget(self.sidebar_frame)
-
-        # ==========================================
-        # RIGHT PANEL: The Page Deck (QStackedWidget)
-        # ==========================================
-        # This is the magic container that acts as our page switcher
-        self.page_deck = QStackedWidget()
-        self.split_layout.addWidget(self.page_deck)
-
-        # Create our 3 distinct page layout views
-        self.create_home_page()
-        self.create_trimmer_page()
-        self.create_settings_page()
-
-        # Connect the sidebar button click triggers to switch pages
-        # .setCurrentIndex() tells the deck which page to bring to the front
-        self.nav_home_btn.clicked.connect(lambda: self.page_deck.setCurrentIndex(0))
-        self.nav_trim_btn.clicked.connect(lambda: self.page_deck.setCurrentIndex(1))
-        self.nav_settings_btn.clicked.connect(lambda: self.page_deck.setCurrentIndex(2))
-
-    # ==========================================
-    # PAGE DEFINITIONS (Views)
-    # ==========================================
-
-    def create_home_page(self):
-        """Page Index 0: The landing dashboard"""
-        page = QWidget()
-        layout = QVBoxLayout(page)
+        open_action = file_menu.addAction("&Open Video...")
+        open_action.triggered.connect(self.open_file_dialog)
         
-        title = QLabel("Welcome to Video Suite")
-        title.setStyleSheet("font-size: 24px; font-weight: bold;")
-        title.setAlignment(Qt.AlignCenter)
-        
-        layout.addWidget(title)
-        
-        # Add this page container to our master deck
-        self.page_deck.addWidget(page)
+        exit_action = file_menu.addAction("&Exit")
+        exit_action.triggered.connect(self.close)
 
-    def create_trimmer_page(self):
-        """Page Index 1: The video trimming workspace"""
-        page = QWidget()
-        layout = QVBoxLayout(page)
-        
-        title = QLabel("Video Trimming Workspace")
-        title.setStyleSheet("font-size: 24px; font-weight: bold;")
-        
-        # This is where your previous video canvas, slider, and inputs would be packed
-        mock_canvas = QWidget()
-        mock_canvas.setStyleSheet("background-color: #111111; border: 1px solid #333333;")
-        
-        layout.addWidget(title)
-        layout.addWidget(mock_canvas, stretch=1)
-        
-        # Add this page container to our master deck
-        self.page_deck.addWidget(page)
+    def open_file_dialog(self):
+        """Triggers local file browser dialog context"""
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Select Video Container", "", "Video Files (*.mp4 *.mov *.avi *.mkv)"
+        )
+        if file_path:
+            self.media_path = file_path
+            self.snip_screen.player.setSource(QUrl.fromLocalFile(file_path))
+            self.snip_screen.player.pause() # Stage the initial clip frame onto our player surface
 
-    def create_settings_page(self):
-        """Page Index 2: App settings configurations"""
-        page = QWidget()
-        layout = QVBoxLayout(page)
-        
-        title = QLabel("Application Settings")
-        title.setStyleSheet("font-size: 24px; font-weight: bold;")
-        
-        layout.addWidget(title)
-        layout.addStretch()
-        
-        # Add this page container to our master deck
-        self.page_deck.addWidget(page)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MultiPageApp()
+    window = MainWindow()
     window.show()
     sys.exit(app.exec())
