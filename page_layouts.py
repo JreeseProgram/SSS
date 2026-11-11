@@ -1,3 +1,5 @@
+from typing import Literal
+
 from PySide6.QtCore import QThreadPool, QTime, QUrl, Qt
 from PySide6.QtWidgets import QButtonGroup, QCheckBox, QComboBox, QFileDialog, QGridLayout, QMessageBox, QRadioButton, QStackedLayout, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSlider, QLineEdit
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
@@ -200,6 +202,7 @@ class SnipScreen(QWidget):
         self.snip_start.setMinimumHeight(25)
         self.snip_start.setMaximumHeight(25)
         self.snip_times.addWidget(self.snip_start)
+        self.snip_start.setEnabled(False)
 
         self.snip_end = QLineEdit()
         self.snip_end.setPlaceholderText("99:59:59.999")
@@ -207,6 +210,7 @@ class SnipScreen(QWidget):
         self.snip_end.setMinimumHeight(25)
         self.snip_end.setMaximumHeight(25)
         self.snip_times.addWidget(self.snip_end)
+        self.snip_end.setEnabled(False)
 
         # Controls
         # Letters are place holders until images are added
@@ -338,6 +342,10 @@ class SnipScreen(QWidget):
 
         self.playback_bar.valueChanged.connect(self.handle_timeline_value_changes)
 
+        self.snip_start.editingFinished.connect(lambda: self.handle_timestamp_manipulation(self.snip_start, "start"))
+        self.timestamp_time.editingFinished.connect(lambda: self.handle_timestamp_manipulation(self.timestamp_time, "playhead"))
+        self.snip_end.editingFinished.connect(lambda: self.handle_timestamp_manipulation(self.snip_end, "end"))
+
         self.timeline_grid.addWidget(self.playback_bar,0,0)
         self.playback_bar.raise_()
 
@@ -414,6 +422,37 @@ class SnipScreen(QWidget):
 
         QThreadPool.globalInstance().start(self.active_thumbnail_worker)
 
+    def handle_timestamp_manipulation(self, field_obj:QLineEdit, current_field: Literal["start","playhead","end"]):
+        current_text = field_obj.text().strip()
+
+        time = QTime.fromString(current_text, "hh:mm:ss.zzz")
+        duration = self.player.duration()
+
+        if time.isValid():
+            ms = QTime(0,0,0).msecsTo(time)
+
+            if 0 <= ms <= duration:
+                corrected_ms = self.frame_time_helper(ms)
+                time_tuple = list(self.playback_bar.value())
+                if current_field == "start" and corrected_ms < self.final_end_bound:
+                    time_tuple[0] = corrected_ms
+                    self.handle_timeline_value_changes(tuple(time_tuple))
+                    return
+                elif current_field == "playhead" and corrected_ms <= self.final_end_bound and corrected_ms >= self.final_start_bound:
+                    time_tuple[1] = corrected_ms
+                    self.handle_timeline_value_changes(tuple(time_tuple))
+                    return
+                elif current_field == "end" and corrected_ms > self.final_start_bound:
+                    time_tuple[2] = corrected_ms
+                    self.handle_timeline_value_changes(tuple(time_tuple))
+
+        if current_field == "start":
+            field_obj.setText(self.format_time(self.final_start_bound))
+        elif current_field == "playhead":
+            field_obj.setText(self.format_time(self.player.position()))
+        elif current_field == "end":
+            field_obj.setText(self.format_time(self.final_end_bound))
+
     def update_thumbnails(self, index, pixmap):
         if index < len(self.thumbnails):
             scaled_pixmap = pixmap.scaled(
@@ -488,6 +527,8 @@ class SnipScreen(QWidget):
                 }
             """)
 
+            self.snip_start.setEnabled(True)
+            self.snip_end.setEnabled(True)
             
             vals = self.playback_bar.value()
             if len(vals) == 3:
@@ -512,6 +553,9 @@ class SnipScreen(QWidget):
                     margin: 0px;
                 }
             """)
+
+            self.snip_start.setEnabled(False)
+            self.snip_end.setEnabled(False)
 
     def handle_timeline_value_changes(self, values_tuple):
         if not self.frame_time: return
