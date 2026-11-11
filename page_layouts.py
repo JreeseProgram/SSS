@@ -672,7 +672,7 @@ class SimpleSizeScreen(QWidget):
         self.size_select_hbox.addWidget(self.size_select_num)
 
         self.size_select_dropdown = QComboBox()
-        self.size_select_dropdown.addItems(["Kbps","Mbps","Gbps"])
+        self.size_select_dropdown.addItems(["KB","MB","GB"])
         self.size_select_dropdown.setCurrentIndex(0)
         self.size_select_hbox.addWidget(self.size_select_dropdown)
 
@@ -694,6 +694,9 @@ class SimpleSizeScreen(QWidget):
 
         self.desired_bitrate_radio.toggled.connect(self.handle_radio_toggle_sync)
         self.desired_size_radio.toggled.connect(self.handle_radio_toggle_sync)
+
+        self.advanced_button.clicked.connect(lambda: self.window().main_workflow_stack.setCurrentIndex(3))
+        self.advanced_button.clicked.connect(lambda: self.window().toggle_advanced())
 
         self.handle_radio_toggle_sync()
         self.calc_bitrate()
@@ -725,7 +728,7 @@ class SimpleSizeScreen(QWidget):
         
         final_size = (bitrate_mbps * duration_seconds) / 8.0
 
-        final_measure = "Mbps" if self.desired_bitrate_radio.isChecked() else self.size_select_dropdown.currentText()
+        final_measure = "MB" if self.desired_bitrate_radio.isChecked() else self.size_select_dropdown.currentText()
 
         self.predicted_size_label.setText(f"Predicted Size: {final_size:.2f} {final_measure}")
 
@@ -739,10 +742,6 @@ class SimpleSizeScreen(QWidget):
 
         self.size_select_num.setEnabled(not is_bitrate)
         self.size_select_dropdown.setEnabled(not is_bitrate)
-
-        
-
-
 
 class SaveScreen(QWidget):
     def __init__(self, parent=None):
@@ -822,8 +821,160 @@ class SaveScreen(QWidget):
 class AdvancedSizeScreen(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        #TODO: Add Later
+        layout = QVBoxLayout(self)
 
+    # top predicted Size
+        self.size_info = QHBoxLayout()
+        self.size_info_list = QVBoxLayout()
+        #left half
+        self.predicted_size_label = QLabel()
+        self.predicted_size_label.setText("Predicted Size: 0.00 MB")
+        self.size_info.addWidget(self.predicted_size_label)
+
+        #right half
+        self.predicted_resolution = QLabel()
+        self.predicted_resolution.setText("Resolution: 1920x1080")
+        self.size_info_list.addWidget(self.predicted_resolution)
+
+        self.predicted_fps = QLabel()
+        self.predicted_fps.setText("Frame Rate: 30 FPS")
+        self.size_info_list.addWidget(self.predicted_fps)
+
+        self.predicted_codec = QLabel()
+        self.predicted_codec.setText("Codec: H.265")
+        self.size_info_list.addWidget(self.predicted_codec)
+
+        self.predicted_bitrate = QLabel()
+        self.predicted_bitrate.setText("Bitrate: ## Mbps")
+        self.size_info_list.addWidget(self.predicted_bitrate)
+
+        self.size_info.addLayout(self.size_info_list)
+
+        layout.addLayout(self.size_info)
+        layout.addStretch()
+
+    #Selection boxes
+        self.all_selections = QHBoxLayout()
+        self.all_selections.addStretch()
+
+        #Left half
+        self.selections_left = QVBoxLayout()
+
+        self.framerate_container = QHBoxLayout()
+        self.framerate_label = QLabel()
+        self.framerate_label.setText("Frame Rate: ")
+        self.framerate_container.addWidget(self.framerate_label)
+        self.framerate_input = QLineEdit()
+        self.framerate_input.setValidator(QIntValidator(1,999999,self))
+        self.framerate_input.setText("30")
+        self.framerate_container.addWidget(self.framerate_input)
+        self.framerate_suffix = QLabel()
+        self.framerate_suffix.setText(" FPS")
+        self.framerate_container.addWidget(self.framerate_suffix)
+        self.selections_left.addLayout(self.framerate_container)
+
+        self.width_container = QHBoxLayout()
+        self.width_label = QLabel()
+        self.width_label.setText("Width: ")
+        self.width_container.addWidget(self.width_label)
+        self.width_input = QLineEdit()
+        self.width_input.setValidator(QIntValidator(1,999999,self))
+        self.width_input.setText("1920")
+        self.width_container.addWidget(self.width_input)
+        self.width_suffix = QLabel()
+        self.width_suffix.setText(" Px")
+        self.width_container.addWidget(self.width_suffix)
+        self.selections_left.addLayout(self.width_container)
+
+        self.height_container = QHBoxLayout()
+        self.height_label = QLabel()
+        self.height_label.setText("Height: ")
+        self.height_container.addWidget(self.height_label)
+        self.height_input = QLineEdit()
+        self.height_input.setValidator(QIntValidator(1,999999,self))
+        self.height_input.setText("1080")
+        self.height_container.addWidget(self.height_input)
+        self.height_suffix = QLabel()
+        self.height_suffix.setText(" Px")
+        self.height_container.addWidget(self.height_suffix)
+        self.selections_left.addLayout(self.height_container)
+
+        self.all_selections.addLayout(self.selections_left)
+        self.all_selections.addSpacing(50)
+
+    # Right Selections
+        self.selection_right = QVBoxLayout()
+
+        self.codec_container = QHBoxLayout()
+        self.codec_label = QLabel()
+        self.codec_label.setText("Codec: ")
+        self.codec_container.addWidget(self.codec_label)
+        self.codec_dropdown = QComboBox()
+        self.codec_dropdown.addItems(["H.264", "H.265", "AV1"])
+        self.codec_dropdown.setCurrentIndex(1)
+        self.codec_container.addWidget(self.codec_dropdown)
+        self.selection_right.addLayout(self.codec_container)
+
+        self.bitrate_container = QHBoxLayout()
+        self.bitrate_label = QLabel()
+        self.bitrate_label.setText("Bitrate: ")
+        self.bitrate_container.addWidget(self.bitrate_label)
+        self.bitrate_input = QLineEdit()
+        self.bitrate_input.setValidator(QIntValidator(1,999999,self))
+        self.bitrate_input.setText("15")
+        self.bitrate_container.addWidget(self.bitrate_input)
+        self.bitrate_dropdown = QComboBox()
+        self.bitrate_dropdown.addItems(["Kbps", "Mbps"])
+        self.bitrate_dropdown.setCurrentIndex(1)
+        self.bitrate_container.addWidget(self.bitrate_dropdown)
+        self.selection_right.addLayout(self.bitrate_container)
+
+        self.all_selections.addLayout(self.selection_right)
+        self.all_selections.addStretch()
+
+        layout.addLayout(self.all_selections)
+        layout.addSpacing(40)
+
+    # Button
+        self.basic_button = QPushButton("Basic")
+        layout.addWidget(self.basic_button)
+        layout.addStretch()
+
+    #Connections
+        self.basic_button.clicked.connect(lambda: self.window().main_workflow_stack.setCurrentIndex(1))
+        self.basic_button.clicked.connect(lambda: self.window().toggle_advanced())
+
+        self.framerate_input.textChanged.connect(lambda text: self.predicted_fps.setText(f"Frame Rate: {text or '0'} FPS"))
+        self.width_input.textChanged.connect(lambda text: self.predicted_resolution.setText(f"Resolution: {text or '0'}x{self.height_input.text() or '0'}"))
+        self.height_input.textChanged.connect(lambda text: self.predicted_resolution.setText(f"Resolution: {self.width_input.text() or '0'}x{text or '0'}"))
+        self.codec_dropdown.currentTextChanged.connect(lambda text: self.predicted_codec.setText(f"Codec: {text}"))
+        self.bitrate_input.textChanged.connect(lambda text: self.predicted_bitrate.setText(f"Bitrate: {text or '0'} {self.bitrate_dropdown.currentText() or 'Mbps'}"))
+        self.bitrate_dropdown.currentTextChanged.connect(lambda text: self.predicted_bitrate.setText(f"Bitrate: {self.bitrate_input.text() or '0'} {text}"))
+
+        self.framerate_input.textChanged.connect(lambda: self.calc_bitrate())
+        self.width_input.textChanged.connect(lambda: self.calc_bitrate())
+        self.height_input.textChanged.connect(lambda: self.calc_bitrate())
+        self.codec_dropdown.currentTextChanged.connect(lambda: self.calc_bitrate())
+        self.bitrate_input.textChanged.connect(lambda: self.calc_bitrate())
+        self.bitrate_dropdown.currentTextChanged.connect(lambda: self.calc_bitrate())
+
+        self.calc_bitrate()
+        
+    def calc_bitrate(self):
+        #TODO: calculate it in a real way
+        result = (
+            int(self.framerate_input.text() or 0) 
+            + int(self.width_input.text() or 0) 
+            + int(self.height_input.text() or 0)
+            + int(self.bitrate_input.text() or 0)
+        )
+
+        result = result/20
+        result = float(result/3.14)
+        
+        self.predicted_size_label.setText(f"Predicted Size: {round(result,2)} MB")
+
+        
 class ErrorScreen(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)

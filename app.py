@@ -2,7 +2,7 @@ import sys
 from PySide6.QtCore import QUrl
 from PySide6.QtWidgets import QApplication, QHBoxLayout, QMainWindow, QFileDialog, QPushButton, QStackedWidget, QVBoxLayout, QWidget
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
-from page_layouts import SnipScreen, SimpleSizeScreen, SaveScreen, LoginScreen, SignUpScreen, SelectFile
+from page_layouts import SnipScreen, SimpleSizeScreen, SaveScreen, LoginScreen, SignUpScreen, SelectFile, AdvancedSizeScreen
 
 
 class MainWindow(QMainWindow):
@@ -11,10 +11,15 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("SSS")
         self.resize(800, 550)
         self.media_path = None
+
+        self.using_advanced = False
+        
+
         self.snip_screen = SnipScreen(self)
         self.login_screen = LoginScreen(self)
         self.signup_screen = SignUpScreen(self)
         self.simple_size_screen = SimpleSizeScreen(self)
+        self.advanced_size_screen = AdvancedSizeScreen(self)
         self.saves_screen = SaveScreen(self)
         self.file_select = SelectFile(self)
 
@@ -46,9 +51,10 @@ class MainWindow(QMainWindow):
         self.main_workflow_stack.addWidget(self.snip_screen)
         self.main_workflow_stack.addWidget(self.simple_size_screen)
         self.main_workflow_stack.addWidget(self.saves_screen)
+        self.main_workflow_stack.addWidget(self.advanced_size_screen)
 
         self.button_snip.clicked.connect(lambda: self.main_workflow_stack.setCurrentIndex(0))
-        self.button_size.clicked.connect(lambda: self.main_workflow_stack.setCurrentIndex(1))
+        self.button_size.clicked.connect(lambda: self.main_workflow_stack.setCurrentIndex(self.determine_size_screen()))
         self.button_save.clicked.connect(lambda: self.main_workflow_stack.setCurrentIndex(2))
 
         self.snip_screen.player.playbackStateChanged.connect(self.snip_screen.playback_state_change)
@@ -79,6 +85,13 @@ class MainWindow(QMainWindow):
         self.button_save.clicked.connect(lambda: self.snip_screen.player.pause())
         self.button_save.clicked.connect(lambda: self.snip_screen.play_button.setChecked(False))
 
+    def toggle_advanced(self): self.using_advanced = not self.using_advanced
+
+    def determine_size_screen(self):
+        if self.using_advanced:
+            return 3
+        else:
+            return 1
 
     def create_menu(self):
         """Generates native system menu navigation entries"""
