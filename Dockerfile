@@ -14,14 +14,15 @@ RUN apt-get update && apt-get install -y \
     libdbus-1-3 \
     libxcb-cursor0 \
     && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 COPY . /app
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir PySide6 pymediainfo superqt
 
 ENV DISPLAY=:0
 ENV QT_QPA_PLATFORM=xcb
 
 EXPOSE 7860
 
-CMD ["sh", "-c", "Xvfb :0 -screen 0 1024x680x24 & fluxbox & x11vnc -display :0 -forever -nopw -rfbport 5900 & websockify --web=/usr/share/novnc/ 7860 localhost:5900 & python app.py"]
+CMD ["sh", "-c", "rm -f /tmp/.X0-lock && Xvfb :0 -screen 0 1024x680x24 & sleep 2 && fluxbox & x11vnc -display :0 -forever -nopw -rfbport 5900 & websockify --web=/usr/share/novnc/ 7860 localhost:5900 & python app.py"]
