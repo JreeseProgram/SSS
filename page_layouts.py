@@ -1,13 +1,14 @@
+import os
 from typing import Literal
 
-from PySide6.QtCore import QThreadPool, QTime, QUrl, Qt
+from PySide6.QtCore import QSize, QThreadPool, QTime, QUrl, Qt
 from PySide6.QtWidgets import QButtonGroup, QCheckBox, QComboBox, QFileDialog, QGridLayout, QMessageBox, QRadioButton, QStackedLayout, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QSlider, QLineEdit
 from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
 from PySide6.QtMultimediaWidgets import QVideoWidget
 from pymediainfo import MediaInfo
 from video_helpers import CreateThumbnails
 from superqt import QLabeledRangeSlider, QLabeledSlider, QRangeSlider
-from PySide6.QtGui import QIntValidator
+from PySide6.QtGui import QIcon, QIntValidator
 
 class LoginScreen(QWidget):
     def __init__(self, parent=None):
@@ -213,28 +214,44 @@ class SnipScreen(QWidget):
         self.snip_end.setEnabled(False)
 
         # Controls
-        # Letters are place holders until images are added
-        self.snip_button = QPushButton("S")
+        self.snip_button = QPushButton("")
         self.snip_button.setFixedSize(25,25)
+        self.snip_button.setIcon(QIcon(os.path.join(os.path.abspath("."), f"Icons/snip.svg")))
+        self.snip_button.setIconSize(QSize(18,18))
+        self.snip_button.setToolTip("Snip Ends Of Clip")
         self.snip_button.setCheckable(True)
         self.snip_button.setChecked(False)
         self.snip_button.clicked.connect(self.handle_snip_toggle)
 
-        self.rewind_button = QPushButton("<")
+        self.rewind_button = QPushButton("")
         self.rewind_button.setFixedSize(25,25)
+        self.rewind_button.setIcon(QIcon(os.path.join(os.path.abspath("."), f"Icons/left-arrow.svg")))
+        self.rewind_button.setIconSize(QSize(18,18))
+        self.rewind_button.setToolTip("Rewinds The Player By 1 Frame")
+        self.rewind_button.setShortcut(",")
         self.rewind_button.clicked.connect(self.back_frame)
 
-        self.play_button = QPushButton("P")
+        self.play_button = QPushButton("")
         self.play_button.setFixedSize(25,25)
+        self.play_button.setIcon(QIcon(os.path.join(os.path.abspath("."), f"Icons/play-pause.svg")))
+        self.play_button.setIconSize(QSize(14,14))
+        self.play_button.setToolTip("Pauses/Plays Video")
         self.play_button.clicked.connect(self.toggle_play)
         self.play_button.setCheckable(True)
 
-        self.forward_button = QPushButton(">")
+        self.forward_button = QPushButton("")
         self.forward_button.setFixedSize(25,25)
+        self.forward_button.setIcon(QIcon(os.path.join(os.path.abspath("."), f"Icons/right-arrow.svg")))
+        self.forward_button.setIconSize(QSize(18,18))
+        self.forward_button.setToolTip("Forwards The Player By 1 Frame")
+        self.forward_button.setShortcut(".")
         self.forward_button.clicked.connect(self.fwd_frame)
 
-        self.repeat_button = QPushButton("R")
+        self.repeat_button = QPushButton("")
         self.repeat_button.setFixedSize(25,25)
+        self.repeat_button.setIcon(QIcon(os.path.join(os.path.abspath("."), f"Icons/replay.svg")))
+        self.repeat_button.setIconSize(QSize(18,18))
+        self.repeat_button.setToolTip("Allows Video To Repeat At Bounds")
         self.repeat_button.setCheckable(True)
         self.repeat_button.setChecked(False)
 
