@@ -41,6 +41,7 @@ class LoginScreen(QWidget):
         self.password_field = QLineEdit()
         self.password_field.setPlaceholderText("Password")
         self.password_field.setMinimumWidth(250)
+        self.password_field.setEchoMode(QLineEdit.Password)
         self.center_password.addWidget(self.password_field)
         self.center_password.addStretch()
 
@@ -112,11 +113,12 @@ class SignUpScreen(QWidget):
         self.password_field = QLineEdit()
         self.password_field.setPlaceholderText("Password")
         self.password_field.setMinimumWidth(250)
+        self.password_field.setEchoMode(QLineEdit.Password)
         self.center_password.addWidget(self.password_field)
         self.center_password.addStretch()
 
         layout.addLayout(self.center_password)
-        layout.addSpacing(100)
+        layout.addSpacing(30)
 
         self.t_and_c = QHBoxLayout()
         self.t_and_c.addStretch()
@@ -136,6 +138,15 @@ class SignUpScreen(QWidget):
         self.center_sign_up.addWidget(self.sign_up_button)
         self.center_sign_up.addStretch()
         layout.addLayout(self.center_sign_up)
+        layout.addStretch()
+
+
+        self.center_return = QHBoxLayout()
+        self.center_return.addStretch()
+        self.return_sign_in_button = QPushButton("Return To Sign In")
+        self.center_return.addWidget(self.return_sign_in_button)
+        self.center_return.addStretch()
+        layout.addLayout(self.center_return)
         layout.addStretch()
 
 class SelectFile(QWidget):

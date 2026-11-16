@@ -73,6 +73,8 @@ class MainWindow(QMainWindow):
 
     def bind_navigation_routes(self):
         self.signup_screen.sign_up_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(2))
+        self.signup_screen.return_sign_in_button.clicked.connect(lambda: self.login_stack.setCurrentIndex(0))
+        
         
         self.snip_screen.player.durationChanged.connect(self.snip_screen.handle_duration_change)
         self.snip_screen.player.positionChanged.connect(self.snip_screen.handle_position_change)
