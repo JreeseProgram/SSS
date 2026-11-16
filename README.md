@@ -24,6 +24,6 @@ winget install Gyan.FFmpeg
 
 Then restart your terminal and type the verison command again. You should have a different result.
 
-Running the program requires you unzip the contents to any place on the computer (**With the \_internal File alongside it as well!!!!**). Then just run SSS.exe
+Running the program requires you unzip the contents to any place on the computer (**With the \_internal and Icons Files alongside it as well!!!!**). Then just run SSS.exe
 
 **Note:** It may say its an untrusted program. This is due to the DLL not being signed by microsoft and I don't have the ability/need to do such a thing atm. Under more options you can select run anyway
